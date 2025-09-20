@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Beep Timer</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: "Poppins", sans-serif;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: white;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .btn {
+      padding: 15px 35px;
+      margin: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    #startBtn {
+      background: #4CAF50;
+      color: white;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+
+    #startBtn:hover {
+      background: #45a049;
+    }
+
+    #stopBtn {
+      background: #e74c3c;
+      color: white;
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    }
+
+    #stopBtn:hover {
+      background: #c0392b;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔔 Beep Every 4 Seconds</h1>
+    <button class="btn" id="startBtn">Start</button>
+    <button class="btn" id="stopBtn">Stop</button>
+  </div>
+
+  <script>
+    let intervalId = null;
+
+    function playBeep() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      oscillator.type = "sine"; 
+      oscillator.frequency.setValueAtTime(440, ctx.currentTime); 
+      gainNode.gain.setValueAtTime(0.1, ctx.currentTime); 
+
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.3); 
+    }
+
+    document.getElementById("startBtn").addEventListener("click", function() {
+      if (intervalId) return; 
+      playBeep(); 
+      intervalId = setInterval(playBeep, 4000);
+    });
+
+    document.getElementById("stopBtn").addEventListener("click", function() {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    });
+  </script>
+</body>
+</html>
