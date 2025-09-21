@@ -2,13 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Beep Timer</title>
+  <title>Beep Timer with Countdown</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
     body {
       height: 100vh;
       display: flex;
@@ -31,6 +26,14 @@
       color: white;
       margin-bottom: 20px;
       font-weight: 600;
+    }
+    #countdown {
+      font-size: 5rem;
+      font-weight: bold;
+      color: #fff;
+      margin: 20px 0;
+      animation: pop 0.5s ease;
+      display: inline-block;
     }
     .btn {
       padding: 15px 35px;
@@ -65,16 +68,26 @@
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    @keyframes pop {
+      0%   { transform: scale(1); opacity: 0.7; }
+      50%  { transform: scale(1.4); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🔔 Beep Every 4 Seconds</h1>
+    <h1>🔔 Countdown Beep</h1>
+    <div id="countdown">4</div>
+    <br>
     <button class="btn" id="startBtn">Start</button>
     <button class="btn" id="stopBtn">Stop</button>
   </div>
+
   <script>
-    let intervalId = null;
+    let countdownId = null;
+    let counter = 4;
+
     function playBeep() {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const oscillator = ctx.createOscillator();
@@ -87,17 +100,40 @@
       oscillator.start();
       oscillator.stop(ctx.currentTime + 0.3);
     }
+
+    function updateCountdown(num) {
+      const countdownEl = document.getElementById("countdown");
+      countdownEl.innerText = num;
+      countdownEl.style.animation = "none"; // reset animation
+      countdownEl.offsetHeight; // trigger reflow
+      countdownEl.style.animation = "pop 0.5s ease"; // play again
+    }
+
+    function startCountdown() {
+      counter = 4;
+      updateCountdown(counter);
+
+      countdownId = setInterval(() => {
+        counter--;
+        if (counter === 0) {
+          playBeep();
+          counter = 4; // reset back to 4
+        }
+        updateCountdown(counter);
+      }, 1000);
+    }
+
     document.getElementById("startBtn").addEventListener("click", function() {
-      if (intervalId) return;
-      playBeep();
-      intervalId = setInterval(playBeep, 4000);
+      if (countdownId) return;
+      startCountdown();
     });
+
     document.getElementById("stopBtn").addEventListener("click", function() {
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
+      clearInterval(countdownId);
+      countdownId = null;
+      updateCountdown(4);
     });
   </script>
 </body>
 </html>
+
